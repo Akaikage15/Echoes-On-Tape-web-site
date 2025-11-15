@@ -74,8 +74,9 @@ releaseCards.forEach(card => {
 });
 
 // Конфигурация анимации
-const ANIM_MS = 420;      // длительность анимации
-const STAGGER_MS = 80;    // задержка между появлением карточек
+const ANIM_MS = 1000;     // длительность анимации (увеличено для максимальной плавности)
+const STAGGER_MS = 120;   // задержка между появлением карточек
+const EASING = 'cubic-bezier(0.4, 0.0, 0.2, 1)'; // очень плавный easing (material design)
 
 // Утилиты FLIP
 function getRects(nodes) {
@@ -83,29 +84,60 @@ function getRects(nodes) {
 }
 
 function invertAndPlay(firstRects, lastRects, nodes, doneCallback) {
+    let animatedCount = 0;
+    const totalNodes = nodes.length;
+    
     nodes.forEach((node, i) => {
         const f = firstRects[i];
         const l = lastRects[i];
-        if (!f || !l) return;
+        if (!f || !l) {
+            animatedCount++;
+            if (animatedCount === totalNodes && doneCallback) doneCallback();
+            return;
+        }
+        
         const dx = f.left - l.left;
         const dy = f.top - l.top;
         const scaleX = f.width / l.width;
         const scaleY = f.height / l.height;
         
-        if (dx || dy || Math.abs(scaleX - 1) > 0.01 || Math.abs(scaleY - 1) > 0.01) {
-            // Применяем инвертированное преобразование
-            node.style.transform = `translate(${dx}px, ${dy}px) scale(${scaleX.toFixed(3)}, ${scaleY.toFixed(3)})`;
-            node.style.transition = 'transform 0s, grid-column 0s';
+        // Применяем анимацию даже при небольших изменениях для плавности
+        if (dx || dy || Math.abs(scaleX - 1) > 0.001 || Math.abs(scaleY - 1) > 0.001) {
+            // Применяем инвертированное преобразование (FLIP техника)
+            node.style.transform = `translate(${dx}px, ${dy}px) scale(${scaleX.toFixed(4)}, ${scaleY.toFixed(4)})`;
+            node.style.transition = 'transform 0s, opacity 0s, grid-column 0s, grid-row 0s';
             
+            // Используем двойной requestAnimationFrame для гарантированного применения
             requestAnimationFrame(() => {
-                // Убираем inline transform, чтобы применились CSS transitions
-                node.style.transition = `transform ${ANIM_MS}ms cubic-bezier(.2,.9,.2,1), opacity ${ANIM_MS}ms cubic-bezier(.2,.9,.2,1), grid-column ${ANIM_MS}ms cubic-bezier(.2,.9,.2,1)`;
-                node.style.transform = '';
+                requestAnimationFrame(() => {
+                    // Убираем inline transform, чтобы применились CSS transitions с очень плавным easing
+                    node.style.transition = `transform ${ANIM_MS}ms ${EASING}, opacity ${ANIM_MS}ms ${EASING}, grid-column ${ANIM_MS}ms ${EASING}, grid-row ${ANIM_MS}ms ${EASING}`;
+                    node.style.transform = '';
+                    
+                    // Отслеживаем завершение анимации
+                    node.addEventListener('transitionend', function onEnd() {
+                        node.removeEventListener('transitionend', onEnd);
+                        animatedCount++;
+                        if (animatedCount === totalNodes && doneCallback) {
+                            doneCallback();
+                        }
+                    }, { once: true });
+                });
             });
+        } else {
+            animatedCount++;
+            if (animatedCount === totalNodes && doneCallback) doneCallback();
         }
     });
-    // колбэк после анимации
-    setTimeout(() => doneCallback && doneCallback(), ANIM_MS + 50);
+    
+    // Fallback timeout на случай если transitionend не сработает
+    if (totalNodes > 0) {
+        setTimeout(() => {
+            if (animatedCount < totalNodes && doneCallback) {
+                doneCallback();
+            }
+        }, ANIM_MS + 200);
+    }
 }
 
 // Скрываем карточку (не display:none, а сворачиваем в ноль, чтобы grid уплотнялся)
@@ -115,19 +147,37 @@ function markHidden(card) {
     // не ставим hidden/display:none тут — делаем это через класс .zero (в CSS он задаёт размеры 0)
     // убираем neon у span'ов
     card.querySelectorAll('.artist-name').forEach(s => s.classList.remove('neon'));
+    // Устанавливаем плавный transition для скрытия
+    card.style.transition = `opacity ${ANIM_MS}ms ${EASING}, transform ${ANIM_MS}ms ${EASING}`;
 }
 
 // Показать карточку (убирает zero/hide и запускает show-anim со stagger)
 function markVisible(card, delay = 0) {
     // убираем zero если есть (чтобы занять место)
-    card.classList.remove('hidden-zero'); // если использовали zero-before, удаляем
-    // подготовим для появления
+    card.classList.remove('hidden-zero');
+    // подготовим для появления с начальным состоянием
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(40px) scale(0.85)';
+    card.style.transition = `opacity ${ANIM_MS}ms ${EASING}, transform ${ANIM_MS}ms ${EASING}`;
+    card.style.transitionDelay = `${delay}ms`;
+    
+    // Применяем класс для показа
     card.classList.remove('hide-anim');
     card.classList.add('show-anim');
-    // применяем stagger через inline transitionDelay
-    card.style.transitionDelay = `${delay}ms`;
+    
+    // Запускаем анимацию появления с небольшой задержкой для плавности
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            card.style.opacity = '';
+            card.style.transform = '';
+        });
+    });
+    
     // очистим delay позже
-    setTimeout(() => card.style.transitionDelay = '', ANIM_MS + delay + 20);
+    setTimeout(() => {
+        card.style.transitionDelay = '';
+        card.style.transition = '';
+    }, ANIM_MS + delay + 100);
 }
 
 // Основная логика фильтрации с FLIP:
@@ -167,115 +217,99 @@ filterBtns.forEach(btn => {
             markHidden(card);
         });
 
-        // Через небольшой таймаут (даём карточкам aнимацию fade-out), сворачиваем их физически (zero sizing),
-        // чтобы grid смог уплотниться. Не используем display:none — iframe не перезагружается.
+        // Плавно скрываем ненужные карточки, затем перестраиваем сетку
         setTimeout(() => {
+            // Сворачиваем скрытые карточки физически (zero sizing)
             willHidden.forEach(card => {
-                // добавляем zeroized — в CSS она делает width/height/padding/margin = 0
                 if (!card.classList.contains('zeroized')) {
                     card.classList.add('zeroized');
-                    // уберём any inline transitionDelay
                     card.style.transitionDelay = '';
                 }
             });
 
-            // Теперь grid уплотнился (browser layout). Получим конечные rects.
-            // Важно пересоздать список nod'ов и rects: порядок DOM не меняем — zeroized items занимают 0.
-            const midNodes = Array.from(document.querySelectorAll('.release-card'));
-            const lastRects = getRects(midNodes);
+            // Получаем текущие позиции видимых карточек ПЕРЕД перестройкой
+            const visibleBefore = willVisible.filter(c => !c.classList.contains('zeroized'));
+            const beforeRects = getRects(visibleBefore);
 
-            // Запускаем FLIP (инвертируем перемещение - делаем гладкую анимацию перестройки)
-            invertAndPlay(firstRects, lastRects, midNodes, () => {
-                // После перестройки — показываем нужные элементы с stagger и подсветкой
+            // Принудительно вызываем reflow для применения zeroized
+            void grid.offsetHeight;
+
+            // Теперь применяем правильное позиционирование
+            const visibleNow = Array.from(document.querySelectorAll('.release-card')).filter(c => !c.classList.contains('zeroized'));
+            
+            // Убираем все старые классы центрирования и сбрасываем grid стили
+            releaseCards.forEach(c => {
+                c.classList.remove('last-centered', 'third-centered');
+                c.style.gridColumn = '';
+                c.style.gridRow = '';
+                c.style.justifySelf = '';
+            });
+            grid.classList.remove('single', 'grid-three-centered');
+
+            if (visibleNow.length === 1) {
+                grid.classList.add('single');
+                grid.style.gridTemplateColumns = '1fr';
+            } else if (visibleNow.length >= 2) {
+                grid.classList.remove('single');
+                grid.style.gridTemplateColumns = 'repeat(2, 1fr)';
+                grid.style.gridAutoFlow = 'row';
+                
+                // Явно устанавливаем позиции для каждой карточки
+                visibleNow.forEach((card, index) => {
+                    card.style.gridColumn = '';
+                    card.style.gridRow = '';
+                    card.style.justifySelf = '';
+                    
+                    if (visibleNow.length % 2 === 1 && index === visibleNow.length - 1) {
+                        card.classList.add('last-centered');
+                        card.style.gridColumn = '1 / -1';
+                        card.style.justifySelf = 'center';
+                    } else {
+                        const col = (index % 2) + 1;
+                        const row = Math.floor(index / 2) + 1;
+                        card.style.gridColumn = col.toString();
+                        card.style.gridRow = row.toString();
+                        card.style.justifySelf = 'start';
+                    }
+                });
+            }
+            
+            // Принудительно вызываем reflow для применения изменений
+            void grid.offsetHeight;
+            
+            // Получаем новые позиции после применения классов
+            const afterRects = getRects(visibleNow);
+            
+            // Применяем FLIP анимацию для плавной перестройки сетки
+            invertAndPlay(beforeRects, afterRects, visibleNow, () => {
+                // После плавной перестройки - показываем карточки с fade-in (если они были скрыты)
+                const allCards = Array.from(document.querySelectorAll('.release-card'));
                 if (filter === 'ALL') {
-                    // убираем zeroized у всех
-                    midNodes.forEach((card, i) => {
-                        if (card.classList.contains('zeroized')) card.classList.remove('zeroized');
-                        markVisible(card, i * (STAGGER_MS / 2));
+                    allCards.forEach((card, i) => {
+                        if (card.classList.contains('zeroized')) {
+                            card.classList.remove('zeroized');
+                            markVisible(card, i * (STAGGER_MS / 2));
+                        }
                     });
                 } else {
                     willVisible.forEach((card, i) => {
-                        // снимаем zeroized если был
-                        if (card.classList.contains('zeroized')) card.classList.remove('zeroized');
-                        // показываем и подсвечиваем нужный span
-                        markVisible(card, i * STAGGER_MS);
+                        if (card.classList.contains('zeroized')) {
+                            card.classList.remove('zeroized');
+                            markVisible(card, i * STAGGER_MS);
+                        }
                         card.querySelectorAll('.artist-name').forEach(span => {
                             if (span.textContent.trim().toUpperCase() === filter) span.classList.add('neon');
                         });
                     });
                 }
-
-                // Логика центрирования карточек с FLIP анимацией:
-                setTimeout(() => {
-                    const visibleNow = Array.from(document.querySelectorAll('.release-card')).filter(c => !c.classList.contains('zeroized'));
-                    
-                    if (visibleNow.length === 0) return;
-                    
-                    // Сохраняем текущие позиции ПЕРЕД изменением классов
-                    const beforeRects = getRects(visibleNow);
-                    
-                    // Убираем все старые классы центрирования и сбрасываем grid стили
-                    releaseCards.forEach(c => {
-                        c.classList.remove('last-centered', 'third-centered');
-                        c.style.gridColumn = '';
-                        c.style.gridRow = '';
-                        c.style.justifySelf = '';
-                    });
-                    grid.classList.remove('single', 'grid-three-centered');
-
-                    if (visibleNow.length === 1) {
-                        // Одна карточка — по центру
-                        grid.classList.add('single');
-                        grid.style.gridTemplateColumns = '1fr';
-                    } else if (visibleNow.length >= 2) {
-                        // Две и более карточек — сетка 2 колонки
-                        grid.classList.remove('single');
-                        grid.style.gridTemplateColumns = 'repeat(2, 1fr)';
-                        grid.style.gridAutoFlow = 'row';
-                        
-                        // Явно устанавливаем позиции для каждой карточки
-                        visibleNow.forEach((card, index) => {
-                            // Сбрасываем все grid стили
-                            card.style.gridColumn = '';
-                            card.style.gridRow = '';
-                            card.style.justifySelf = '';
-                            
-                            // Если нечетное количество и это последняя карточка
-                            if (visibleNow.length % 2 === 1 && index === visibleNow.length - 1) {
-                                // Последняя карточка занимает обе колонки и центрируется
-                                card.classList.add('last-centered');
-                                card.style.gridColumn = '1 / -1';
-                                card.style.justifySelf = 'center';
-                            } else {
-                                // Обычные карточки - по одной в колонке
-                                const col = (index % 2) + 1;
-                                const row = Math.floor(index / 2) + 1;
-                                card.style.gridColumn = col.toString();
-                                card.style.gridRow = row.toString();
-                                card.style.justifySelf = 'start';
-                            }
-                        });
-                    }
-                    
-                    // Принудительно вызываем reflow для применения изменений
-                    void grid.offsetHeight;
-                    
-                    // Получаем новые позиции после применения классов
-                    const afterRects = getRects(visibleNow);
-                    
-                    // Применяем FLIP анимацию для плавной перестройки сетки
-                    invertAndPlay(beforeRects, afterRects, visibleNow, () => {
-                        // Очищаем inline стили после анимации
-                        visibleNow.forEach(card => {
-                            card.style.transition = '';
-                        });
-                    });
-
-                }, 50); // Небольшая задержка для завершения предыдущих анимаций
-
+                
+                // Очищаем inline transition после анимации
+                visibleNow.forEach(card => {
+                    card.style.transition = '';
+                });
             });
 
-        }, 220); // время чтобы fade-out завершился и браузер успел перерисовать
+        }, ANIM_MS); // Ждем полного завершения fade-out перед перестройкой
 
     });
 });
