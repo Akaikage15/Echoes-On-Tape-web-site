@@ -336,19 +336,15 @@ a:hover {
 /* === RELEASES GRID — 2 В РЯД, АДАПТИВНО === */
 .releases-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, 1fr);
     gap: 50px;
     padding: 40px 0;
     justify-content: center;
-    transition: all 0.6s ease;
     min-height: 600px;
     position: relative;
     z-index: 1;
-}
-
-/* Центрирование ТОЛЬКО при 1 видимой карточке */
-.releases-grid.centered {
-    grid-template-columns: 1fr;
+    grid-auto-flow: row;
+    transition: grid-template-columns 420ms cubic-bezier(.2,.9,.2,1), gap 420ms cubic-bezier(.2,.9,.2,1);
 }
 
 /* 1 карточка — по центру */
@@ -357,21 +353,17 @@ a:hover {
     justify-items: center;
 }
 
-/* Центрирование третьей карточки при 3 */
-.release-card.third-centered {
+/* Центрирование последней нечетной карточки (занимает обе колонки и центрируется) */
+.release-card.last-centered {
     grid-column: 1 / -1;
     justify-self: center;
-    width: 100%;
     max-width: 580px;
-}
-
-.third-centered {
-    grid-column: 1 / -1;
-    justify-self: center;
+    width: 100%;
+    transition: grid-column 420ms cubic-bezier(.2,.9,.2,1), transform 420ms cubic-bezier(.2,.9,.2,1), opacity 420ms cubic-bezier(.2,.9,.2,1);
 }
 
 
-/* Карточка */
+/* Карточка - базовые стили */
 .release-card {
     display: flex;
     align-items: center;
@@ -382,15 +374,10 @@ a:hover {
     max-width: 580px;
     padding: 18px;
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    visibility: visible;
-    transition: 
-        opacity 0.5s ease,
-        transform 0.5s ease,
-        visibility 0s linear 0.5s;
     box-sizing: border-box;
-    margin: 0 auto;
+    visibility: visible;
+    grid-column: span 1;
+    justify-self: start;
 }
 
 /* Обложка */
@@ -656,8 +643,8 @@ iframe[src*="yandex.ru"] {
 }
 
 @media (max-width: 992px) {
+    /* НЕ меняем grid-template-columns здесь - оставляем 2 колонки на десктопе */
     .releases-grid {
-        grid-template-columns: 1fr;
         gap: 40px;
     }
 
@@ -729,42 +716,25 @@ iframe[src*="yandex.ru"] {
     transition: color 0.3s ease, text-shadow 0.3s ease;
 }
 
-/* Плавная перестройка сетки */
-.releases-grid {
-    transition: grid-template-columns 260ms ease, gap 260ms ease;
-}
-
-.release-card {
-    transition:
-        transform 0.45s ease,
-        opacity 0.45s ease;
-}
-
-
 /* =========================
    FLIP / Pinterest + Spotify-style
    ========================= */
 
-/* убедимся, что grid сможет плотно упакововать элементы */
-.releases-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 40px;
-    grid-auto-flow: dense; /* ключ для плотной упаковки */
-    transition: gap 220ms ease, grid-template-columns 220ms ease;
-}
-
-/* общие карточки — анимируем transform и opacity */
+/* общие карточки — анимируем transform, opacity и grid-column */
 .release-card {
     transition:
         opacity 420ms cubic-bezier(.2,.9,.2,1),
         transform 420ms cubic-bezier(.2,.9,.2,1),
+        grid-column 420ms cubic-bezier(.2,.9,.2,1),
         height 260ms ease,
         margin 260ms ease,
         padding 260ms ease;
-    will-change: transform, opacity;
+    will-change: transform, opacity, grid-column;
     opacity: 1;
+    transform: translateY(0) scale(1);
     transform-origin: center top;
+    grid-column: span 1;
+    justify-self: start;
 }
 
 /* Стадия скрытия (fade-out + down + scale) */
@@ -801,18 +771,7 @@ iframe[src*="yandex.ru"] {
 
 /* Сохраняем display:block для grid — не ставим display:none ни в коем случае */
 
-/* Центрирование третьей карточки */
-.release-card.third-centered {
-    grid-column: 1 / -1;
-    justify-self: center;
-    width: 100%;
-    max-width: 580px;
-}
-
-/* Когда сетка в режиме three-centered — можно немного корректировать gap */
-.releases-grid.grid-three-centered {
-    gap: 30px;
-}
+/* Удалено - используем .last-centered вместо .third-centered */
 
 /* НЕОНОВАЯ подсветка только для span внутри артиста */
 .artist-name.neon {

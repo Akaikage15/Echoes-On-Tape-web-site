@@ -89,17 +89,23 @@ function invertAndPlay(firstRects, lastRects, nodes, doneCallback) {
         if (!f || !l) return;
         const dx = f.left - l.left;
         const dy = f.top - l.top;
-        if (dx || dy) {
-            node.style.transform = `translate(${dx}px, ${dy}px) scale(${(f.width / l.width).toFixed(3)})`;
-            node.style.transition = 'transform 0s';
+        const scaleX = f.width / l.width;
+        const scaleY = f.height / l.height;
+        
+        if (dx || dy || Math.abs(scaleX - 1) > 0.01 || Math.abs(scaleY - 1) > 0.01) {
+            // Применяем инвертированное преобразование
+            node.style.transform = `translate(${dx}px, ${dy}px) scale(${scaleX.toFixed(3)}, ${scaleY.toFixed(3)})`;
+            node.style.transition = 'transform 0s, grid-column 0s';
+            
             requestAnimationFrame(() => {
-                node.style.transition = `transform ${ANIM_MS}ms cubic-bezier(.2,.9,.2,1), opacity ${ANIM_MS}ms ease`;
+                // Убираем inline transform, чтобы применились CSS transitions
+                node.style.transition = `transform ${ANIM_MS}ms cubic-bezier(.2,.9,.2,1), opacity ${ANIM_MS}ms cubic-bezier(.2,.9,.2,1), grid-column ${ANIM_MS}ms cubic-bezier(.2,.9,.2,1)`;
                 node.style.transform = '';
             });
         }
     });
     // колбэк после анимации
-    setTimeout(() => doneCallback && doneCallback(), ANIM_MS + 20);
+    setTimeout(() => doneCallback && doneCallback(), ANIM_MS + 50);
 }
 
 // Скрываем карточку (не display:none, а сворачиваем в ноль, чтобы grid уплотнялся)
@@ -199,46 +205,73 @@ filterBtns.forEach(btn => {
                     });
                 }
 
-                // специальная логика центрирования при 3 видимых:
+                // Логика центрирования карточек с FLIP анимацией:
                 setTimeout(() => {
                     const visibleNow = Array.from(document.querySelectorAll('.release-card')).filter(c => !c.classList.contains('zeroized'));
-                    // убираем класс grid-three с прошлых состояний
-                    grid.classList.remove('grid-three-centered');
-                    // удаляем третью центровку у всех
-                    document.querySelectorAll('.release-card.third-centered').forEach(n => n.classList.remove('third-centered'));
+                    
+                    if (visibleNow.length === 0) return;
+                    
+                    // Сохраняем текущие позиции ПЕРЕД изменением классов
+                    const beforeRects = getRects(visibleNow);
+                    
+                    // Убираем все старые классы центрирования и сбрасываем grid стили
+                    releaseCards.forEach(c => {
+                        c.classList.remove('last-centered', 'third-centered');
+                        c.style.gridColumn = '';
+                        c.style.gridRow = '';
+                        c.style.justifySelf = '';
+                    });
+                    grid.classList.remove('single', 'grid-three-centered');
 
                     if (visibleNow.length === 1) {
-                        // Один в центре
+                        // Одна карточка — по центру
                         grid.classList.add('single');
-
-                    } else if (visibleNow.length === 2) {
-                        // Две карточки должны стать в ряд (2 колонки)
+                        grid.style.gridTemplateColumns = '1fr';
+                    } else if (visibleNow.length >= 2) {
+                        // Две и более карточек — сетка 2 колонки
                         grid.classList.remove('single');
-                        grid.classList.remove('grid-three-centered');
-
-                        visibleNow.forEach(c => c.classList.remove('third-centered'));
-
-                        // Лишние zeroized могут оставлять «следы» — очищаем жёстко
-                        releaseCards.forEach(c => c.classList.remove('third-centered'));
-
-                    } else if (visibleNow.length === 3) {
-                        // Три карточки: 2 сверху + 1 по центру
-                        grid.classList.remove('single');
-
-                        const third = visibleNow[2];
-                        if (third) {
-                            third.classList.add('third-centered');
-                            grid.classList.add('grid-three-centered');
-                        }
-
-                    } else {
-                        // 4+ карточек — обычный layout
-                        grid.classList.remove('single');
-                        grid.classList.remove('grid-three-centered');
-                        releaseCards.forEach(c => c.classList.remove('third-centered'));
+                        grid.style.gridTemplateColumns = 'repeat(2, 1fr)';
+                        grid.style.gridAutoFlow = 'row';
+                        
+                        // Явно устанавливаем позиции для каждой карточки
+                        visibleNow.forEach((card, index) => {
+                            // Сбрасываем все grid стили
+                            card.style.gridColumn = '';
+                            card.style.gridRow = '';
+                            card.style.justifySelf = '';
+                            
+                            // Если нечетное количество и это последняя карточка
+                            if (visibleNow.length % 2 === 1 && index === visibleNow.length - 1) {
+                                // Последняя карточка занимает обе колонки и центрируется
+                                card.classList.add('last-centered');
+                                card.style.gridColumn = '1 / -1';
+                                card.style.justifySelf = 'center';
+                            } else {
+                                // Обычные карточки - по одной в колонке
+                                const col = (index % 2) + 1;
+                                const row = Math.floor(index / 2) + 1;
+                                card.style.gridColumn = col.toString();
+                                card.style.gridRow = row.toString();
+                                card.style.justifySelf = 'start';
+                            }
+                        });
                     }
+                    
+                    // Принудительно вызываем reflow для применения изменений
+                    void grid.offsetHeight;
+                    
+                    // Получаем новые позиции после применения классов
+                    const afterRects = getRects(visibleNow);
+                    
+                    // Применяем FLIP анимацию для плавной перестройки сетки
+                    invertAndPlay(beforeRects, afterRects, visibleNow, () => {
+                        // Очищаем inline стили после анимации
+                        visibleNow.forEach(card => {
+                            card.style.transition = '';
+                        });
+                    });
 
-                }, ANIM_MS + 20);
+                }, 50); // Небольшая задержка для завершения предыдущих анимаций
 
             });
 
@@ -246,6 +279,67 @@ filterBtns.forEach(btn => {
 
     });
 });
+
+// === ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ ===
+// Применяем правильное центрирование при загрузке страницы
+function initializeCardLayout() {
+    const grid = document.querySelector('.releases-grid');
+    if (!grid) return;
+    
+    const visibleCards = Array.from(document.querySelectorAll('.release-card')).filter(c => !c.classList.contains('zeroized'));
+    
+    if (visibleCards.length === 0) return;
+    
+    // Убираем все старые классы центрирования и сбрасываем grid стили
+    document.querySelectorAll('.release-card').forEach(c => {
+        c.classList.remove('last-centered', 'third-centered');
+        c.style.gridColumn = '';
+        c.style.gridRow = '';
+        c.style.justifySelf = '';
+    });
+    grid.classList.remove('single', 'grid-three-centered');
+    
+    if (visibleCards.length === 1) {
+        grid.classList.add('single');
+        grid.style.gridTemplateColumns = '1fr';
+    } else if (visibleCards.length >= 2) {
+        // Принудительно устанавливаем grid на 2 колонки
+        grid.style.gridTemplateColumns = 'repeat(2, 1fr)';
+        grid.style.gridAutoFlow = 'row';
+        
+        // Явно устанавливаем позиции для каждой карточки
+        visibleCards.forEach((card, index) => {
+            // Сбрасываем все grid стили
+            card.style.gridColumn = '';
+            card.style.gridRow = '';
+            card.style.justifySelf = '';
+            
+            // Если нечетное количество и это последняя карточка
+            if (visibleCards.length % 2 === 1 && index === visibleCards.length - 1) {
+                // Последняя карточка занимает обе колонки и центрируется
+                card.classList.add('last-centered');
+                card.style.gridColumn = '1 / -1';
+                card.style.justifySelf = 'center';
+            } else {
+                // Обычные карточки - по одной в колонке
+                const col = (index % 2) + 1;
+                const row = Math.floor(index / 2) + 1;
+                card.style.gridColumn = col.toString();
+                card.style.gridRow = row.toString();
+                card.style.justifySelf = 'start';
+            }
+        });
+    }
+}
+
+// Инициализируем при загрузке DOM и после небольшой задержки (на случай если карточки загружаются асинхронно)
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeCardLayout);
+} else {
+    initializeCardLayout();
+}
+// Дополнительная инициализация после небольшой задержки
+setTimeout(initializeCardLayout, 100);
 
 // === ИНИЦИАЛИЗАЦИЯ PARTICLES.JS ===
 if (typeof particlesJS === 'function') {
