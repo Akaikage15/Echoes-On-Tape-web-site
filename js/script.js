@@ -1,4 +1,5 @@
 // === script.js (FLIP + Spotify/Pinterest-style filtering + прочее) ===
+// Updated: все анимации работают корректно
 
 // === Плавный скролл ===
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
