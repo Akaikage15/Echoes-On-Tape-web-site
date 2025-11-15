@@ -1,0 +1,741 @@
+/* === RESET & BASE === */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #0a0a0a;
+    color: #fff;
+    font-family: 'Roboto', sans-serif;
+    overflow-x: hidden;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+h1, h2, h3 {
+    font-family: 'Orbitron', sans-serif;
+    letter-spacing: 2px;
+}
+
+a {
+    color: #b19cd9;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+a:hover {
+    color: #fff;
+    text-shadow: 0 0 10px #b19cd9;
+}
+
+/* === HEADER === */
+.header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    padding: 15px 0;
+    transition: 0.4s;
+}
+
+.header.scrolled {
+    padding: 10px 0;
+    background: rgba(0,0,0,0.95);
+}
+
+.header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo-main {
+    height: 50px;
+    animation: breathe 3s ease-in-out infinite, glow 2s ease-in-out infinite alternate;
+    transition: transform 0.3s ease;
+    filter: drop-shadow(0 0 8px #b19cd9);
+}
+
+.logo-main:hover {
+    transform: scale(1.08);
+    filter: drop-shadow(0 0 20px #b19cd9) drop-shadow(0 0 40px #b19cd9);
+}
+
+.nav a {
+    margin: 0 15px;
+    font-weight: 300;
+    position: relative;
+}
+
+.nav a::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: #b19cd9;
+    transition: 0.3s;
+}
+
+.nav a:hover::after {
+    width: 100%;
+}
+
+/* === HERO === */
+.hero {
+    min-height: 100vh;
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding-top: 80px;
+}
+
+.hero-bg {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(135deg, #1a0033, #000) fixed;
+    opacity: 0.7;
+    z-index: -1;
+}
+
+#particles-js {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding-bottom: 80px;
+}
+
+.hero h1 {
+    font-size: 5.5rem;
+    background: linear-gradient(90deg, #b19cd9, #fff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 15px;
+    text-shadow: 0 0 20px rgba(177, 156, 217, 0.5);
+}
+
+.hero p {
+    font-size: 1.4rem;
+    margin-bottom: 60px;
+    opacity: 0.95;
+}
+
+/* === ULTRA WIDE YOUTUBE === */
+.youtube-container.ultra-wide {
+    position: relative;
+    width: 95vw;
+    max-width: 1400px;
+    margin: 50px auto 0;
+    padding-bottom: 53.4vw;
+    height: 0;
+    overflow: hidden;
+    border-radius: 20px;
+    box-shadow: 
+        0 0 40px rgba(177, 156, 217, 0.6),
+        0 0 80px rgba(177, 156, 217, 0.3);
+    border: 4px solid #b19cd9;
+    animation: float 7s ease-in-out infinite, glow-border 3s ease-in-out infinite alternate;
+    transform: translateX(-50%);
+    left: 50%;
+}
+
+.youtube-container.ultra-wide iframe {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%; border: 0;
+}
+
+@keyframes glow-border {
+    from { 
+        box-shadow: 
+            0 0 40px rgba(177, 156, 217, 0.6),
+            0 0 80px rgba(177, 156, 217, 0.3);
+    }
+    to { 
+        box-shadow: 
+            0 0 60px rgba(177, 156, 217, 0.8),
+            0 0 120px rgba(177, 156, 217, 0.5),
+            0 0 160px rgba(177, 156, 217, 0.2);
+    }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateX(-50%) translateY(0) rotate(0deg); }
+    50% { transform: translateX(-50%) translateY(-15px) rotate(0.5deg); }
+}
+
+/* === SECTION TITLES === */
+.section-title {
+    text-align: center;
+    font-size: 2.8rem;
+    margin-bottom: 50px;
+    position: relative;
+}
+
+.section-title::after {
+    content: '';
+    display: block;
+    width: 80px;
+    height: 3px;
+    background: #b19cd9;
+    margin: 15px auto 0;
+    border-radius: 2px;
+}
+
+/* === ARTISTS === */
+.artists {
+    padding: 100px 0;
+    background: #111;
+}
+
+.artists-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+.artist-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: 0.4s;
+    perspective: 1000px;
+}
+
+.artist-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: 0.6s;
+}
+
+.artist-card:hover img {
+    transform: scale(1.1) rotateY(10deg);
+    filter: brightness(0.7);
+}
+
+.overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0,0,0,0.9));
+    padding: 40px 20px 20px;
+    transform: translateY(100%);
+    transition: 0.4s;
+}
+
+.artist-card:hover .overlay {
+    transform: translateY(0);
+}
+
+.overlay h3 {
+    font-size: 1.5rem;
+    text-align: center;
+}
+
+/* === RELEASES === */
+/* === RELEASES LOGO BACKGROUND — ВИДИМЫЙ + СТАБИЛЬНЫЙ === */
+.releases {
+    position: relative;
+    overflow: hidden;
+    padding: 140px 0 100px;
+    background: #0a0a0a;
+    min-height: 900px;
+    z-index: 0;
+}
+
+#releases-particles {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.releases-logo-bg {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 750px; height: 750px;
+    background: url('../images/logo-echoes-no-tape.jpg') center/contain no-repeat;
+    opacity: 0.25;
+    transform: translate(-50%, -50%);
+    z-index: 0;
+    pointer-events: none;
+    filter: drop-shadow(0 0 40px rgba(177, 156, 217, 0.5));
+    animation: logoPulse 6s ease-in-out infinite alternate;
+}
+
+/* Плавное появление */
+@keyframes logoFadeIn {
+    from { 
+        opacity: 0; 
+        transform: translate(-50%, -50%) scale(0.7); 
+        filter: drop-shadow(0 0 10px rgba(177, 156, 217, 0.1));
+    }
+    to { 
+        opacity: 0.18; 
+        transform: translate(-50%, -50%) scale(1); 
+        filter: drop-shadow(0 0 20px rgba(177, 156, 217, 0.3));
+    }
+}
+
+/* Пульсация */
+@keyframes logoPulse {
+    from { 
+        filter: drop-shadow(0 0 40px rgba(177, 156, 217, 0.5));
+        transform: translate(-50%, -50%) scale(1);
+    }
+    to { 
+        filter: drop-shadow(0 0 60px rgba(177, 156, 217, 0.7));
+        transform: translate(-50%, -50%) scale(1.04);
+    }
+}
+
+.releases > .container {
+    position: relative;
+    z-index: 1;
+}
+
+.filters {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.filter-btn {
+    background: transparent;
+    border: 1px solid #b19cd9;
+    color: #fff;
+    padding: 8px 16px;
+    margin: 0 5px;
+    cursor: pointer;
+    transition: 0.3s;
+    border-radius: 8px;
+}
+
+.filter-btn:hover, .filter-btn.active {
+    background: #b19cd9;
+    color: #000;
+}
+
+/* === RELEASES GRID — 2 В РЯД, АДАПТИВНО === */
+.releases-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 50px;
+    padding: 40px 0;
+    justify-content: center;
+    transition: all 0.6s ease;
+    min-height: 600px;
+    position: relative;
+    z-index: 1;
+}
+
+/* Центрирование ТОЛЬКО при 1 видимой карточке */
+.releases-grid.centered {
+    grid-template-columns: 1fr;
+}
+
+/* 1 карточка — по центру */
+.releases-grid.single {
+    grid-template-columns: 1fr;
+    justify-items: center;
+}
+
+/* Центрирование третьей карточки при 3 */
+.release-card.third-centered {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: 100%;
+    max-width: 580px;
+}
+
+.third-centered {
+    grid-column: 1 / -1;
+    justify-self: center;
+}
+
+
+/* Карточка */
+.release-card {
+    display: flex;
+    align-items: center;
+    background: #1a1a1a;
+    border-radius: 16px;
+    overflow: hidden;
+    width: 100%;
+    max-width: 580px;
+    padding: 18px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    visibility: visible;
+    transition: 
+        opacity 0.5s ease,
+        transform 0.5s ease,
+        visibility 0s linear 0.5s;
+    box-sizing: border-box;
+    margin: 0 auto;
+}
+
+/* Обложка */
+.release-card img {
+    width: 180px;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-right: 24px;
+    flex-shrink: 0; /* Не сжимается */
+    transition: transform 0.6s ease, box-shadow 0.6s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.release-card:hover img {
+    transform: scale(1.05) rotate(2deg);
+    box-shadow: 0 0 20px rgba(177, 156, 217, 0.6);
+}
+
+/* Название релиза — градиент при hover */
+.release-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0 0 8px;
+    background: linear-gradient(90deg, #ffffff, #b19cd9);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    background-size: 200% 100%;
+    transition: background-position 0.6s ease;
+    background-position: 100% 0;
+}
+
+.release-card:hover .release-title {
+    background-position: 0% 0;
+}
+
+/* Артисты */
+.release-artist {
+    font-size: 0.95rem;
+    color: #b19cd9;
+    margin-bottom: 12px;
+}
+
+/* Текстовая часть */
+.release-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+    height: 100%; /* Заполняет высоту */
+}
+
+.release-info h3 {
+    font-size: 1.6rem;
+    margin: 0;
+    line-height: 1.15;
+}
+
+.release-info p {
+    opacity: 0.85;
+    font-size: 0.92rem;
+    margin: 0;
+}
+
+/* Iframe — фиксированная высота */
+.release-info iframe {
+    height: 80px; /* Фиксируем, чтобы не растягивало */
+    margin: 10px 0;
+}
+
+/* Кнопки */
+.links {
+    display: flex;
+    gap: 12px;
+    margin-top: 14px;
+}
+
+.btn {
+    padding: 9px 18px;
+    font-size: 0.88rem;
+    border: 1.5px solid #b19cd9;
+    border-radius: 8px;
+}
+
+.btn:hover {
+    background: #b19cd9;
+    color: #000;
+    box-shadow: 0 0 16px rgba(177, 156, 217, 0.6);
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Плавное скрытие */
+.release-card.hiding {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
+    height: 0;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    transition: all 0.5s ease;
+}
+
+/* Полное скрытие после анимации */
+.release-card.hidden {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+    visibility: hidden;
+    transition: 
+        opacity 0.5s ease,
+        transform 0.5s ease,
+        visibility 0s linear 0.5s;
+}
+
+/* СКРЫТАЯ КАРТОЧКА — УБИРАЕМ ИЗ ПОТОКА */
+.release-card.hidden {
+    display: none !important;
+} 
+
+/* СКРЫТИЕ — БЕЗ УДАЛЕНИЯ ИЗ ПОТОКА */
+/* .release-card.hidden {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+    visibility: hidden;
+    transition: 
+        opacity 0.5s ease,
+        transform 0.5s ease,
+        visibility 0s linear 0.5s; 
+} */
+
+iframe[src*="yandex.ru"] {
+    width: 100%;
+    height: 100px;
+    border: none;
+    margin: 20px 0;
+    box-shadow: 0 0 10px rgba(177, 156, 217, 0.5);
+}
+
+/* === CONTACT === */
+.contact {
+    padding: 100px 0;
+    text-align: center;
+    background: #0a0a0a;
+}
+
+.contact a {
+    font-weight: bold;
+}
+
+/* === FOOTER === */
+.footer {
+    padding: 50px 0;
+    text-align: center;
+    background: #000;
+}
+
+.footer-logo {
+    height: 80px;
+    margin-bottom: 15px;
+    animation: breathe 3s ease-in-out infinite, glow 2s ease-in-out infinite alternate;
+    transition: transform 0.5s ease;
+    filter: drop-shadow(0 0 8px #b19cd9);
+}
+
+.footer-logo:hover {
+    transform: rotate(360deg) scale(1.1);
+    filter: drop-shadow(0 0 30px #b19cd9) drop-shadow(0 0 60px #b19cd9);
+}
+
+/* === АНИМАЦИИ === */
+@keyframes breathe {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+@keyframes glow {
+    from { filter: drop-shadow(0 0 8px #b19cd9); }
+    to { filter: drop-shadow(0 0 25px #b19cd9) drop-shadow(0 0 50px rgba(177, 156, 217, 0.6)); }
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(50px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+    .hero h1 { font-size: 3.5rem; }
+    .youtube-container.ultra-wide { width: 94vw; padding-bottom: 53vw; }
+    .release-card { flex-direction: column; }
+    .release-card img { width: 100%; height: 250px; }
+    .nav { flex-direction: column; gap: 10px; }
+    .releases-logo-bg { width: 300px; height: 300px; }
+}
+
+@media (max-width: 768px) {
+    .logo-img {
+        height: 40px;
+    }
+    .logo-text {
+        font-size: 1.1rem;
+    }
+    .logo {
+        gap: 8px;
+    }
+}
+
+/* === LOGO WITH TEXT === */
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo-img {
+    height: 50px;
+    width: auto;
+    animation: breathe 3s ease-in-out infinite, glow 2s ease-in-out infinite alternate;
+    transition: transform 0.3s ease;
+    filter: drop-shadow(0 0 8px #b19cd9);
+}
+
+.logo-img:hover {
+    transform: scale(1.08);
+    filter: drop-shadow(0 0 20px #b19cd9) drop-shadow(0 0 40px #b19cd9);
+}
+
+/* Текст рядом с логотипом */
+.logo-text {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 1.5px;
+    background: linear-gradient(90deg, #b19cd9, #fff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: textGlow 2s ease-in-out infinite alternate;
+    opacity: 0.9;
+}
+
+@keyframes textGlow {
+    from { text-shadow: 0 0 8px rgba(177, 156, 217, 0.6); }
+    to { text-shadow: 0 0 20px rgba(177, 156, 217, 0.9); }
+}
+
+/* Дыхание (для изображения) */
+@keyframes breathe {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+@keyframes glow {
+    from { filter: drop-shadow(0 0 8px #b19cd9); }
+    to { filter: drop-shadow(0 0 25px #b19cd9) drop-shadow(0 0 50px rgba(177, 156, 217, 0.6)); }
+}
+
+@media (max-width: 992px) {
+    .releases-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+
+    .release-card {
+        height: auto;
+        min-height: auto;
+        flex-direction: column;
+    }
+
+    .release-card img {
+        margin-right: 0;
+        margin-bottom: 20px;
+    }
+
+
+    .release-info {
+        gap: 12px;
+    }
+
+    .links {
+        justify-content: center;
+    }
+}
+
+/* Анимация скрытия */
+.release-card.hide-anim {
+    opacity: 0 !important;
+    transform: translateY(25px) scale(0.92) !important;
+    pointer-events: none;
+}
+
+/* Анимация появления */
+.release-card.show-anim {
+    opacity: 1 !important;
+    transform: translateY(0) scale(1) !important;
+    pointer-events: auto;
+}
+
+/* Плавность */
+.release-card {
+    transition:
+        opacity 450ms cubic-bezier(.2, .9, .2, 1),
+        transform 450ms cubic-bezier(.2, .9, .2, 1);
+    will-change: transform, opacity;
+}
+
+.release-artist.highlighted {
+    color: #b19cd9;
+    font-weight: 600;
+    filter: drop-shadow(0px 0px 4px rgba(177,156,217,0.5));
+    transition: 0.3s ease;
+}
+
+/* Неоновая подсветка одного имени артиста */
+.artist-name.neon {
+    color: #ffffff;
+    font-weight: 800;
+    text-shadow: 
+        0 0 8px rgba(255,255,255,0.9),
+        0 0 18px rgba(255,255,255,0.5),
+        0 0 28px rgba(255,255,255,0.3);
+    transition: text-shadow 260ms ease, color 260ms ease;
+}
+
+.release-artist.neon {
+    color: #ffffff;
+    font-weight: 700;
+    text-shadow: 0 0 8px rgba(255,255,255,0.8), 0 0 15px rgba(255,255,255,0.6);
+    transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+/* Плавная перестройка сетки */
+.releases-grid {
+    transition: grid-template-columns 260ms ease, gap 260ms ease;
+}
+
+.release-card {
+    transition:
+        transform 0.45s ease,
+        opacity 0.45s ease;
+}

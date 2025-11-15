@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Echoes On Tape</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+    <script src="js/script.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <!-- Изображение логотипа -->
+                <img src="images/logo-echoes-no-tape-mono.png" alt="Echoes On Tape Logo" class="logo-img">
+                <!-- Текст лейбла (резервный, если картинка не грузится) -->
+                <span class="logo-text">Echoes On Tape</span>
+            </div>
+            <nav class="nav">
+                <a href="#home">Home</a>
+                <a href="#artists">Artists</a>
+                <a href="#releases">Releases</a>
+                <a href="#contact">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- HERO with Particles + Full YouTube -->
+    <section id="home" class="hero">
+        <!-- Particles Background -->
+        <div id="particles-js"></div>
+
+        <div class="hero-bg parallax-bg"></div>
+        <div class="container hero-content">
+            <h1>ECHOES<br>ON TAPE</h1>
+            <p>Independent Promo Label</p>
+
+    <!-- ULTRA WIDE YOUTUBE -->
+        <div class="youtube-container ultra-wide">
+            <iframe 
+                src="https://www.youtube.com/embed/QMyGDbwrQt8?autoplay=0&mute=0&loop=1&playlist=QMyGDbwrQt8&controls=1&modestbranding=1" 
+                title="Echoes On Tape Promo" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowfullscreen>
+            </iframe>
+        </div>
+    </div>
+</section>
+
+    <!-- ARTISTS with 3D -->
+    <section id="artists" class="artists">
+        <div class="container">
+            <h2 class="section-title">Artists</h2>
+            <div class="artists-grid">
+                <div class="artist-card" data-name="LVX3 DRXWN">
+                    <img src="images/artist1.webp" alt="LVX3 DRXWN">
+                    <div class="overlay">
+                        <h3>LVX3 DRXWN</h3>
+                    </div>
+                </div>
+                <div class="artist-card" data-name="LXST MXRCY">
+                    <img src="images/artist3.jpg" alt="LXST MXRCY">
+                    <div class="overlay">
+                        <h3>LXST MXRCY</h3>
+                    </div>
+                </div>
+                <div class="artist-card" data-name="Last Akai | F">
+                    <img src="images/artist2.jpg" alt="Last Akai | F">
+                    <div class="overlay">
+                        <h3>Last Akai | F</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- RELEASES with Multi + Filters -->
+    <section id="releases" class="releases">
+        <!-- Фоновый логотип -->
+        <div id="releases-particles"></div>
+        <div class="releases-logo-bg"></div>
+
+        <div class="container">
+            <h2 class="section-title">Releases</h2>
+            <div class="filters">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="LXST MXRCRY">LXST MXRCRY</button>
+                <button class="filter-btn" data-filter="LXV3 DRXWN">LXV3 DRXWN</button>
+            </div>
+            <div class="releases-grid">
+
+                <!-- Release 1 -->
+                <div class="release-card" data-artist="LXST MXRCRY, LXV3 DRXWN">
+                    <img src="images/release-meadown-cushion.jpg" alt="MEADOWN CUSHION">
+                    <div class="release-info">
+                        <h3 class="release-title">MEADOWN CUSHION</h3>
+                        <p class="release-artist">LXST MXRCRY, LXV3 DRXWN</p>
+                        <iframe frameborder="0" style="border:none;width:100%;height:80px;"
+                            src="https://music.yandex.ru/iframe/#track/142839998/38191012"></iframe>
+                    </div>
+                </div>
+
+                <!-- Release 2 -->
+                <div class="release-card" data-artist="LXST MXRCRY">
+                    <img src="images/release-meadown-cushion.jpg" alt="UNIVERSE">
+                    <div class="release-info">
+                        <h3 class="release-title">UNIVERSE</h3>
+                        <p class="release-artist">LXST MXRCRY</p>
+                        <iframe frameborder="0" style="border:none;width:100%;height:80px;"
+                            src="https://music.yandex.ru/iframe/#track/142840000/38191012"></iframe>
+                    </div>
+                </div>
+
+                <!-- Release 3 -->
+                <div class="release-card" data-artist="LXST MXRCRY, LXV3 DRXWN">
+                    <img src="images/release-meadown-cushion.jpg" alt="PLETHORA">
+                    <div class="release-info">
+                        <h3 class="release-title">PLETHORA</h3>
+                        <p class="release-artist">LXST MXRCRY, LXV3 DRXWN</p>
+                        <iframe frameborder="0" style="border:none;width:100%;height:80px;"
+                            src="https://music.yandex.ru/iframe/#track/142840002/38191012"></iframe>
+                    </div>
+                </div>
+
+                <!-- Release 4 -->
+                <div class="release-card" data-artist="LXST MXRCRY, LXV3 DRXWN">
+                    <img src="images/release-meadown-cushion.jpg" alt="LUCID ECHO">
+                    <div class="release-info">
+                        <h3 class="release-title">LUCID ECHO</h3>
+                        <p class="release-artist">LXST MXRCRY, LXV3 DRXWN</p>
+                        <iframe frameborder="0" style="border:none;width:100%;height:80px;"
+                            src="https://music.yandex.ru/iframe/#track/142840004/38191012"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2 class="section-title">Contact</h2>
+            <p>Submit your demo: <a href="mailto:echoesontape@gmail.com">echoesontape@gmail.com</a></p>
+            <p>Follow us: 
+                <a href="https://www.youtube.com/@EchoesonTape" target="_blank">YouTube</a> | 
+                <a href="https://t.me/lxst_mxrcry" target="_blank">Telegram</a> | 
+                <a href="https://music.yandex.ru/artist/23298177?utm_source=desktop&utm_medium=copy_link" target="_blank">Yandex Music</a>
+            </p>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="container">
+            <img src="images/logo-echoes-no-tape-mono.png" alt="Echoes No Tape" class="footer-logo">
+            <p>© 2025 Echoes On Tape. All rights reserved.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
