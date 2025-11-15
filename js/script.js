@@ -258,7 +258,18 @@ filterBtns.forEach(btn => {
             // Настраиваем grid на основе общего количества видимых карточек
             const totalVisible = willVisible.length;
             
-            if (totalVisible === 1) {
+            // На мобильных всегда 1 колонка
+            if (isMobile()) {
+                grid.classList.add('single');
+                grid.style.gridTemplateColumns = '1fr';
+                // Сбрасываем все grid стили для мобильных
+                willVisible.forEach(card => {
+                    card.classList.remove('last-centered');
+                    card.style.gridColumn = '';
+                    card.style.gridRow = '';
+                    card.style.justifySelf = '';
+                });
+            } else if (totalVisible === 1) {
                 grid.classList.add('single');
                 grid.style.gridTemplateColumns = '1fr';
             } else if (totalVisible >= 2) {
@@ -339,6 +350,11 @@ filterBtns.forEach(btn => {
     });
 });
 
+// Проверка мобильного устройства
+function isMobile() {
+    return window.innerWidth <= 768;
+}
+
 // === ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ ===
 // Применяем правильное центрирование при загрузке страницы
 function initializeCardLayout() {
@@ -358,7 +374,11 @@ function initializeCardLayout() {
     });
     grid.classList.remove('single', 'grid-three-centered');
     
-    if (visibleCards.length === 1) {
+    // На мобильных всегда 1 колонка
+    if (isMobile()) {
+        grid.style.gridTemplateColumns = '1fr';
+        grid.classList.add('single');
+    } else if (visibleCards.length === 1) {
         grid.classList.add('single');
         grid.style.gridTemplateColumns = '1fr';
     } else if (visibleCards.length >= 2) {
@@ -401,23 +421,280 @@ if (document.readyState === 'loading') {
 // Дополнительная инициализация после небольшой задержки
 setTimeout(initializeCardLayout, 100);
 
+// Обработчик изменения размера окна для адаптивности
+let resizeTimeout;
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+        initializeCardLayout();
+    }, 250);
+});
+
 // === ИНИЦИАЛИЗАЦИЯ PARTICLES.JS ===
-if (typeof particlesJS === 'function') {
-    particlesJS('particles-js', {
-      particles: {
-        number: { value: 80, density: { enable: true, value_area: 800 } },
-        color: { value: '#b19cd9' },
-        shape: { type: 'circle' },
-        opacity: { value: 0.6, random: true },
-        size: { value: 3, random: true },
-        line_linked: { enable: true, distance: 150, color: '#b19cd9', opacity: 0.3, width: 1 },
-        move: { enable: true, speed: 2 }
-      },
-      interactivity: {
-        detect_on: 'canvas',
-        events: { onhover: { enable: true, mode: 'repulse' }, onclick: { enable: true, mode: 'push' }, resize: true },
-        modes: { repulse: { distance: 100, duration: 0.4 }, push: { particles_nb: 4 } }
-      },
-      retina_detect: true
-    });
+// Версия с треугольниками, цветовыми переходами и реакцией на курсор
+
+// Глобальные переменные для цветовых переходов
+let scrollProgress = 0;
+let timeOffset = 0;
+
+// Получение цвета на основе скролла и времени
+function getDynamicColor() {
+    const baseColor = { r: 177, g: 156, b: 217 }; // #b19cd9
+    const time = Date.now() * 0.0005 + timeOffset;
+    const scroll = scrollProgress;
+    
+    // Плавные цветовые переходы
+    const r = Math.floor(baseColor.r + Math.sin(time) * 30 + scroll * 20);
+    const g = Math.floor(baseColor.g + Math.cos(time * 0.7) * 20 + scroll * 15);
+    const b = Math.floor(baseColor.b + Math.sin(time * 1.3) * 40 + scroll * 25);
+    
+    return `rgb(${Math.max(0, Math.min(255, r))}, ${Math.max(0, Math.min(255, g))}, ${Math.max(0, Math.min(255, b))})`;
 }
+
+// Основная функция инициализации партиклов
+function initParticles() {
+    if (typeof particlesJS === 'function') {
+        // Основные партиклы в hero секции
+        particlesJS('particles-js', {
+            particles: {
+                number: { 
+                    value: 80, 
+                    density: { enable: true, value_area: 800 } 
+                },
+                color: { value: '#b19cd9' },
+                shape: { 
+                    type: 'circle'
+                },
+                opacity: { 
+                    value: 0.6, 
+                    random: true,
+                    anim: { enable: true, speed: 0.5, opacity_min: 0.3, sync: false }
+                },
+                size: { 
+                    value: 3, 
+                    random: true,
+                    anim: { enable: true, speed: 2, size_min: 1, sync: false }
+                },
+                line_linked: { 
+                    enable: true, 
+                    distance: 180, 
+                    color: '#b19cd9', 
+                    opacity: 0.4, 
+                    width: 1.5,
+                    triangles: { enable: true, opacity: 0.1 }
+                },
+                move: { 
+                    enable: true, 
+                    speed: 2,
+                    direction: 'none',
+                    random: true,
+                    straight: false,
+                    out_mode: 'out',
+                    bounce: false
+                }
+            },
+            interactivity: {
+                detect_on: 'canvas',
+                events: { 
+                    onhover: { 
+                        enable: true, 
+                        mode: 'grab'
+                    }, 
+                    onclick: { 
+                        enable: true, 
+                        mode: 'push'
+                    }, 
+                    resize: true 
+                },
+                modes: { 
+                    grab: {
+                        distance: 200,
+                        line_linked: {
+                            opacity: 0.6
+                        }
+                    },
+                    push: { 
+                        particles_nb: 2 
+                    }
+                }
+            },
+            retina_detect: true
+        });
+
+        // Партиклы в секции releases
+        const releasesParticles = document.getElementById('releases-particles');
+        if (releasesParticles) {
+            particlesJS('releases-particles', {
+                particles: {
+                    number: { 
+                        value: 60, 
+                        density: { enable: true, value_area: 1000 } 
+                    },
+                    color: { value: '#b19cd9' },
+                    shape: { type: 'circle' },
+                    opacity: { 
+                        value: 0.4, 
+                        random: true,
+                        anim: { enable: true, speed: 0.3, opacity_min: 0.2, sync: false }
+                    },
+                    size: { 
+                        value: 3, 
+                        random: true 
+                    },
+                    line_linked: { 
+                        enable: true, 
+                        distance: 200, 
+                        color: '#b19cd9', 
+                        opacity: 0.2, 
+                        width: 1 
+                    },
+                    move: { 
+                        enable: true, 
+                        speed: 1.5,
+                        direction: 'none',
+                        random: true,
+                        straight: false,
+                        out_mode: 'out',
+                        bounce: false
+                    }
+                },
+                interactivity: {
+                    detect_on: 'canvas',
+                    events: { 
+                        onhover: { 
+                            enable: true, 
+                            mode: 'repulse' 
+                        }, 
+                        onclick: { 
+                            enable: true, 
+                            mode: 'push' 
+                        }, 
+                        resize: true 
+                    },
+                    modes: { 
+                        repulse: { 
+                            distance: 120, 
+                            duration: 0.5 
+                        },
+                        push: { 
+                            particles_nb: 4 
+                        }
+                    }
+                },
+                retina_detect: true
+            });
+        }
+    }
+}
+
+// Инициализация партиклов после загрузки
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initParticles);
+} else {
+    initParticles();
+}
+
+// Обновление скролла для цветовых переходов
+window.addEventListener('scroll', () => {
+    const windowHeight = window.innerHeight;
+    const documentHeight = document.documentElement.scrollHeight;
+    scrollProgress = window.scrollY / (documentHeight - windowHeight);
+    scrollProgress = Math.max(0, Math.min(1, scrollProgress));
+});
+
+// Обновление цвета партиклов с цветовыми переходами
+function updateParticleColors() {
+    if (!window.pJSDom || window.pJSDom.length === 0) return;
+    
+    const time = Date.now() * 0.001;
+    timeOffset = time;
+    const dynamicColor = getDynamicColor();
+    
+    window.pJSDom.forEach((pJSDom) => {
+        const pJS = pJSDom.pJS;
+        if (!pJS || !pJS.particles) return;
+        
+        // Обновляем цвет линий через конфигурацию
+        if (pJS.particles.line_linked && pJS.particles.line_linked.color) {
+            if (typeof pJS.particles.line_linked.color === 'object' && pJS.particles.line_linked.color.value !== undefined) {
+                pJS.particles.line_linked.color.value = dynamicColor;
+            }
+        }
+        
+        // Обновляем цвет партиклов
+        if (pJS.particles.array) {
+            pJS.particles.array.forEach((particle) => {
+                if (particle && particle.color && typeof particle.color === 'object') {
+                    if (particle.color.value !== undefined) {
+                        particle.color.value = dynamicColor;
+                    }
+                }
+            });
+        }
+    });
+    
+    requestAnimationFrame(updateParticleColors);
+}
+
+// Запускаем обновление цветов
+requestAnimationFrame(updateParticleColors);
+
+// Мягкое взаимодействие с курсором - легкое притяжение
+function updateMouseInteraction() {
+    if (!window.pJSDom || window.pJSDom.length === 0) {
+        requestAnimationFrame(updateMouseInteraction);
+        return;
+    }
+    
+    window.pJSDom.forEach((pJSDom) => {
+        const pJS = pJSDom.pJS;
+        if (!pJS || !pJS.particles || !pJS.particles.array || !pJS.interactivity) return;
+        
+        const canvas = pJSDom.canvas.el;
+        if (!canvas) return;
+        
+        // Получаем позицию мыши относительно canvas
+        const mouse = pJS.interactivity.mouse;
+        if (!mouse || !mouse.pos_x || !mouse.pos_y) {
+            requestAnimationFrame(updateMouseInteraction);
+            return;
+        }
+        
+        const mouseX = mouse.pos_x;
+        const mouseY = mouse.pos_y;
+        
+        // Применяем мягкое притяжение к курсору
+        pJS.particles.array.forEach((particle) => {
+            if (!particle || particle.x === undefined || particle.y === undefined) return;
+            
+            const dx = mouseX - particle.x;
+            const dy = mouseY - particle.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance > 0 && distance < 250) {
+                // Мягкое притяжение - чем ближе, тем сильнее, но очень деликатно
+                const attractionStrength = 0.02; // Очень слабая сила
+                const distanceFactor = 1 - (distance / 250); // От 1 (близко) до 0 (далеко)
+                const force = attractionStrength * distanceFactor * distanceFactor; // Квадрат для более плавного затухания
+                
+                if (particle.vx !== undefined && particle.vy !== undefined) {
+                    // Ограничиваем максимальную скорость для плавности
+                    const maxSpeed = 0.5;
+                    const vx = (dx / distance) * force;
+                    const vy = (dy / distance) * force;
+                    
+                    particle.vx += Math.max(-maxSpeed, Math.min(maxSpeed, vx));
+                    particle.vy += Math.max(-maxSpeed, Math.min(maxSpeed, vy));
+                }
+            }
+        });
+    });
+    
+    requestAnimationFrame(updateMouseInteraction);
+}
+
+// Запускаем мягкое взаимодействие с курсором после небольшой задержки
+setTimeout(() => {
+    requestAnimationFrame(updateMouseInteraction);
+}, 1000);
+

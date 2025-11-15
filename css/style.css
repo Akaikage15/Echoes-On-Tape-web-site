@@ -111,7 +111,7 @@ a:hover {
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
     z-index: 0;
-    pointer-events: none;
+    pointer-events: auto;
 }
 
 .hero-content {
@@ -575,24 +575,279 @@ iframe[src*="yandex.ru"] {
 }
 
 /* === RESPONSIVE === */
+/* Мобильная версия (до 768px) */
 @media (max-width: 768px) {
-    .hero h1 { font-size: 3.5rem; }
-    .youtube-container.ultra-wide { width: 94vw; padding-bottom: 53vw; }
-    .release-card { flex-direction: column; }
-    .release-card img { width: 100%; height: 250px; }
-    .nav { flex-direction: column; gap: 10px; }
-    .releases-logo-bg { width: 300px; height: 300px; }
+    /* Container */
+    .container {
+        padding: 0 15px;
+    }
+
+    /* Header */
+    .header {
+        padding: 12px 0;
+    }
+
+    .header .container {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .logo-img {
+        height: 35px;
+    }
+
+    .logo-text {
+        font-size: 0.9rem;
+        letter-spacing: 1px;
+    }
+
+    .logo {
+        gap: 6px;
+    }
+
+    .nav {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 8px;
+    }
+
+    .nav a {
+        margin: 0 8px;
+        font-size: 0.9rem;
+    }
+
+    /* Hero */
+    .hero {
+        min-height: 100vh;
+        padding-top: 70px;
+        padding-bottom: 40px;
+    }
+
+    .hero-content {
+        padding-bottom: 40px;
+    }
+
+    .hero h1 {
+        font-size: 2.5rem;
+        line-height: 1.2;
+        margin-bottom: 15px;
+    }
+
+    .hero p {
+        font-size: 1rem;
+        margin-bottom: 30px;
+    }
+
+    .youtube-container.ultra-wide {
+        width: 100%;
+        max-width: 100%;
+        padding-bottom: 56.25%; /* 16:9 aspect ratio */
+        margin: 30px auto 0;
+        border-width: 2px;
+    }
+
+    /* Section Titles */
+    .section-title {
+        font-size: 2rem;
+        margin-bottom: 30px;
+    }
+
+    /* Artists */
+    .artists {
+        padding: 60px 0;
+    }
+
+    .artists-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .artist-card {
+        min-height: 250px;
+    }
+
+    .overlay h3 {
+        font-size: 1.2rem;
+    }
+
+    /* Releases */
+    .releases {
+        padding: 80px 0 60px;
+        min-height: auto;
+    }
+
+    .releases-logo-bg {
+        width: 250px;
+        height: 250px;
+        opacity: 0.15;
+    }
+
+    .filters {
+        margin-bottom: 25px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .filter-btn {
+        padding: 6px 12px;
+        font-size: 0.85rem;
+        margin: 0;
+    }
+
+    .releases-grid {
+        grid-template-columns: 1fr !important;
+        gap: 25px;
+        padding: 20px 0;
+        min-height: auto;
+    }
+
+    .release-card {
+        flex-direction: column;
+        align-items: stretch;
+        max-width: 100%;
+        padding: 15px;
+    }
+
+    .release-card img {
+        width: 100%;
+        height: 200px;
+        margin-right: 0;
+        margin-bottom: 15px;
+    }
+
+    .release-info {
+        width: 100%;
+    }
+
+    .release-title {
+        font-size: 1.2rem;
+        margin-bottom: 6px;
+    }
+
+    .release-artist {
+        font-size: 0.85rem;
+        margin-bottom: 10px;
+    }
+
+    .release-info iframe {
+        height: 70px;
+        margin: 8px 0;
+    }
+
+    /* Убираем центрирование последней карточки на мобильных */
+    .release-card.last-centered {
+        grid-column: 1 !important;
+        justify-self: stretch !important;
+        max-width: 100% !important;
+    }
+
+    /* Contact */
+    .contact {
+        padding: 60px 0;
+    }
+
+    .contact p {
+        font-size: 0.9rem;
+        line-height: 1.8;
+        margin-bottom: 15px;
+    }
+
+    .contact a {
+        word-break: break-all;
+    }
+
+    /* Footer */
+    .footer {
+        padding: 40px 0;
+    }
+
+    .footer-logo {
+        height: 50px;
+        margin-bottom: 10px;
+    }
+
+    .footer p {
+        font-size: 0.85rem;
+    }
+
+    /* Улучшаем touch-события на мобильных */
+    .filter-btn,
+    .nav a,
+    .artist-card {
+        -webkit-tap-highlight-color: rgba(177, 156, 217, 0.3);
+        touch-action: manipulation;
+    }
 }
 
-@media (max-width: 768px) {
-    .logo-img {
-        height: 40px;
+/* Планшеты (768px - 992px) */
+@media (min-width: 769px) and (max-width: 992px) {
+    .hero h1 {
+        font-size: 4rem;
     }
+
+    .youtube-container.ultra-wide {
+        width: 95vw;
+        padding-bottom: 53.4vw;
+    }
+
+    .artists-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 25px;
+    }
+
+    .releases-grid {
+        gap: 35px;
+    }
+}
+
+/* Очень маленькие экраны (до 480px) */
+@media (max-width: 480px) {
+    .hero h1 {
+        font-size: 2rem;
+        letter-spacing: 1px;
+    }
+
+    .hero p {
+        font-size: 0.9rem;
+    }
+
+    .section-title {
+        font-size: 1.6rem;
+    }
+
     .logo-text {
+        font-size: 0.75rem;
+    }
+
+    .nav a {
+        font-size: 0.8rem;
+        margin: 0 5px;
+    }
+
+    .filter-btn {
+        padding: 5px 10px;
+        font-size: 0.75rem;
+    }
+
+    .release-card {
+        padding: 12px;
+    }
+
+    .release-card img {
+        height: 180px;
+    }
+
+    .release-title {
         font-size: 1.1rem;
     }
-    .logo {
-        gap: 8px;
+
+    .release-artist {
+        font-size: 0.8rem;
     }
 }
 
@@ -646,8 +901,8 @@ iframe[src*="yandex.ru"] {
     to { filter: drop-shadow(0 0 25px #b19cd9) drop-shadow(0 0 50px rgba(177, 156, 217, 0.6)); }
 }
 
-@media (max-width: 992px) {
-    /* НЕ меняем grid-template-columns здесь - оставляем 2 колонки на десктопе */
+@media (min-width: 769px) and (max-width: 992px) {
+    /* Планшеты - оставляем 2 колонки */
     .releases-grid {
         gap: 40px;
     }
@@ -662,7 +917,6 @@ iframe[src*="yandex.ru"] {
         margin-right: 0;
         margin-bottom: 20px;
     }
-
 
     .release-info {
         gap: 12px;
@@ -797,52 +1051,7 @@ iframe[src*="yandex.ru"] {
    To preview: add class "mobile-A" or "mobile-B" to <body> or use media queries (below)
    ---------------------------- */
 
-/* Default responsive behaviour (mobile A): single column */
-@media (max-width: 768px) {
-    .releases-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-
-    .release-card {
-        flex-direction: column;
-        align-items: stretch;
-        height: auto;
-    }
-
-    .release-card img {
-        width: 100%;
-        height: 220px;
-        margin-right: 0;
-        margin-bottom: 12px;
-    }
-
-    /* Version A: classic single column (this is default mobile) */
-}
-
-/* Version B: compact 2 in row on mobile — use body.mobile-B to preview */
-@media (max-width: 768px) {
-    body.mobile-B .releases-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-    }
-
-    body.mobile-B .release-card {
-        flex-direction: column;
-        height: auto;
-    }
-
-    body.mobile-B .release-card img {
-        width: 100%;
-        height: 140px;
-        margin-right: 0;
-        margin-bottom: 8px;
-    }
-
-    body.mobile-B .release-info {
-        padding: 8px 6px;
-    }
-}
+/* Мобильная версия releases grid уже обработана выше в общем медиа-запросе */
 
 /* Extra: when grid.single is active (1 visible card) — центруем */
 .releases-grid.single {
