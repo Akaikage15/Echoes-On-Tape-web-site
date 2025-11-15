@@ -228,17 +228,33 @@ filterBtns.forEach(btn => {
             });
 
             // Получаем текущие позиции видимых карточек ПЕРЕД перестройкой
-            const visibleBefore = willVisible.filter(c => !c.classList.contains('zeroized'));
-            const beforeRects = getRects(visibleBefore);
+            // Включаем карточки, которые были скрыты и теперь должны быть показаны
+            const currentlyVisible = willVisible.filter(c => !c.classList.contains('zeroized'));
+            const beforeRects = getRects(currentlyVisible);
 
             // Принудительно вызываем reflow для применения zeroized
             void grid.offsetHeight;
 
-            // Теперь применяем правильное позиционирование
-            const visibleNow = Array.from(document.querySelectorAll('.release-card')).filter(c => !c.classList.contains('zeroized'));
+            // ВАЖНО: Сначала убираем zeroized у карточек, которые должны быть видны
+            // чтобы они заняли место в grid перед применением позиционирования
+            willVisible.forEach(card => {
+                if (card.classList.contains('zeroized')) {
+                    card.classList.remove('zeroized');
+                    // Убираем также hide-anim, чтобы карточка была готова к показу
+                    card.classList.remove('hide-anim');
+                    card.classList.add('show-anim');
+                }
+            });
+
+            // Принудительно вызываем reflow после удаления zeroized
+            void grid.offsetHeight;
+
+            // Теперь применяем правильное позиционирование ко ВСЕМ видимым карточкам
+            const visibleNow = willVisible; // Используем willVisible, так как мы уже убрали zeroized
             
             // Убираем все старые классы центрирования и сбрасываем grid стили
-            releaseCards.forEach(c => {
+            // ВАЖНО: удаляем у ВСЕХ карточек, не только видимых
+            document.querySelectorAll('.release-card').forEach(c => {
                 c.classList.remove('last-centered', 'third-centered');
                 c.style.gridColumn = '';
                 c.style.gridRow = '';
@@ -256,15 +272,19 @@ filterBtns.forEach(btn => {
                 
                 // Явно устанавливаем позиции для каждой карточки
                 visibleNow.forEach((card, index) => {
+                    // Убеждаемся, что класс удален перед проверкой
+                    card.classList.remove('last-centered');
                     card.style.gridColumn = '';
                     card.style.gridRow = '';
                     card.style.justifySelf = '';
                     
+                    // ТОЛЬКО если нечетное количество И это последняя карточка
                     if (visibleNow.length % 2 === 1 && index === visibleNow.length - 1) {
                         card.classList.add('last-centered');
                         card.style.gridColumn = '1 / -1';
                         card.style.justifySelf = 'center';
                     } else {
+                        // Для всех остальных - обычное позиционирование по 2 в ряд
                         const col = (index % 2) + 1;
                         const row = Math.floor(index / 2) + 1;
                         card.style.gridColumn = col.toString();
@@ -282,21 +302,10 @@ filterBtns.forEach(btn => {
             
             // Применяем FLIP анимацию для плавной перестройки сетки
             invertAndPlay(beforeRects, afterRects, visibleNow, () => {
-                // После плавной перестройки - показываем карточки с fade-in (если они были скрыты)
-                const allCards = Array.from(document.querySelectorAll('.release-card'));
-                if (filter === 'ALL') {
-                    allCards.forEach((card, i) => {
-                        if (card.classList.contains('zeroized')) {
-                            card.classList.remove('zeroized');
-                            markVisible(card, i * (STAGGER_MS / 2));
-                        }
-                    });
-                } else {
-                    willVisible.forEach((card, i) => {
-                        if (card.classList.contains('zeroized')) {
-                            card.classList.remove('zeroized');
-                            markVisible(card, i * STAGGER_MS);
-                        }
+                // После плавной перестройки - добавляем подсветку артистов
+                // Fade-in уже не нужен, так как карточки уже видимы после FLIP анимации
+                if (filter !== 'ALL') {
+                    willVisible.forEach((card) => {
                         card.querySelectorAll('.artist-name').forEach(span => {
                             if (span.textContent.trim().toUpperCase() === filter) span.classList.add('neon');
                         });
@@ -343,19 +352,20 @@ function initializeCardLayout() {
         
         // Явно устанавливаем позиции для каждой карточки
         visibleCards.forEach((card, index) => {
-            // Сбрасываем все grid стили
+            // Убеждаемся, что класс удален перед проверкой
+            card.classList.remove('last-centered');
             card.style.gridColumn = '';
             card.style.gridRow = '';
             card.style.justifySelf = '';
             
-            // Если нечетное количество и это последняя карточка
+            // ТОЛЬКО если нечетное количество И это последняя карточка
             if (visibleCards.length % 2 === 1 && index === visibleCards.length - 1) {
                 // Последняя карточка занимает обе колонки и центрируется
                 card.classList.add('last-centered');
                 card.style.gridColumn = '1 / -1';
                 card.style.justifySelf = 'center';
             } else {
-                // Обычные карточки - по одной в колонке
+                // Для всех остальных - обычное позиционирование по 2 в ряд
                 const col = (index % 2) + 1;
                 const row = Math.floor(index / 2) + 1;
                 card.style.gridColumn = col.toString();
