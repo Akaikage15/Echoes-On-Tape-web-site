@@ -31,36 +31,6 @@
 
 ---
 
-## 🚀 Быстрый старт
-
-### Локальный запуск
-
-1. **Клонируйте репозиторий**
-   ```bash
-   git clone https://github.com/Akaikage15/Echoes-On-Tape-web-site.git
-   cd Echoes-On-Tape-web-site
-   ```
-
-2. **Откройте в браузере**
-   - Просто откройте `index.html` в браузере
-   - Или используйте Live Server в VS Code
-   - Или запустите локальный сервер:
-     ```bash
-     python -m http.server 8000
-     # или
-     npx serve
-     ```
-
-3. **Готово!** 🎉 Сайт должен открыться локально
-
-### Деплой на GitHub Pages
-
-1. Перейдите в **Settings** → **Pages**
-2. Выберите ветку `main` как источник
-3. Сайт автоматически задеплоится на `https://akaikage15.github.io/Echoes-On-Tape-web-site/`
-
----
-
 ## 🛠️ Технологии
 
 | Технология | Описание |
