@@ -739,3 +739,148 @@ iframe[src*="yandex.ru"] {
         transform 0.45s ease,
         opacity 0.45s ease;
 }
+
+
+/* =========================
+   FLIP / Pinterest + Spotify-style
+   ========================= */
+
+/* убедимся, что grid сможет плотно упакововать элементы */
+.releases-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px;
+    grid-auto-flow: dense; /* ключ для плотной упаковки */
+    transition: gap 220ms ease, grid-template-columns 220ms ease;
+}
+
+/* общие карточки — анимируем transform и opacity */
+.release-card {
+    transition:
+        opacity 420ms cubic-bezier(.2,.9,.2,1),
+        transform 420ms cubic-bezier(.2,.9,.2,1),
+        height 260ms ease,
+        margin 260ms ease,
+        padding 260ms ease;
+    will-change: transform, opacity;
+    opacity: 1;
+    transform-origin: center top;
+}
+
+/* Стадия скрытия (fade-out + down + scale) */
+.release-card.hide-anim {
+    opacity: 0;
+    transform: translateY(20px) scale(0.94);
+    pointer-events: none;
+}
+
+/* Стадия показа */
+.release-card.show-anim {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+/* zeroized — делает элемент визуально нулевого размера, чтобы grid уплотнился */
+.release-card.zeroized {
+    height: 0 !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+    opacity: 0 !important;
+    overflow: hidden !important;
+    transform: translateY(0) scale(0.98) !important;
+    pointer-events: none !important;
+}
+
+/* класс, который можно применять вместо zeroized (deprecated compatibility) */
+.release-card.zeroized, .release-card.hidden-zero {
+    display: block;
+}
+
+/* Сохраняем display:block для grid — не ставим display:none ни в коем случае */
+
+/* Центрирование третьей карточки */
+.release-card.third-centered {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: 100%;
+    max-width: 580px;
+}
+
+/* Когда сетка в режиме three-centered — можно немного корректировать gap */
+.releases-grid.grid-three-centered {
+    gap: 30px;
+}
+
+/* НЕОНОВАЯ подсветка только для span внутри артиста */
+.artist-name.neon {
+    color: #ffffff;
+    font-weight: 800;
+    text-shadow: 0 0 8px rgba(255,255,255,0.9), 0 0 18px rgba(255,255,255,0.5);
+    transition: text-shadow 260ms ease, color 260ms ease;
+}
+
+/* Stagger: transitionDelay ставится inline из JS */
+
+/* ----------------------------
+   MOBILE LAYOUTS: A (default) and B
+   To preview: add class "mobile-A" or "mobile-B" to <body> or use media queries (below)
+   ---------------------------- */
+
+/* Default responsive behaviour (mobile A): single column */
+@media (max-width: 768px) {
+    .releases-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .release-card {
+        flex-direction: column;
+        align-items: stretch;
+        height: auto;
+    }
+
+    .release-card img {
+        width: 100%;
+        height: 220px;
+        margin-right: 0;
+        margin-bottom: 12px;
+    }
+
+    /* Version A: classic single column (this is default mobile) */
+}
+
+/* Version B: compact 2 in row on mobile — use body.mobile-B to preview */
+@media (max-width: 768px) {
+    body.mobile-B .releases-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    body.mobile-B .release-card {
+        flex-direction: column;
+        height: auto;
+    }
+
+    body.mobile-B .release-card img {
+        width: 100%;
+        height: 140px;
+        margin-right: 0;
+        margin-bottom: 8px;
+    }
+
+    body.mobile-B .release-info {
+        padding: 8px 6px;
+    }
+}
+
+/* Extra: when grid.single is active (1 visible card) — центруем */
+.releases-grid.single {
+    grid-template-columns: 1fr;
+    justify-items: center;
+}
+
+/* fallback/visual polish */
+.release-artist { transition: color 200ms ease, text-shadow 200ms ease; }
